@@ -9,7 +9,7 @@ uses
 , SysUtils
 , syncobjs
 , Noso.Core.Messages
-, Noso.Core.Message
+//, Noso.Core.Message
 , Noso.Core.Modules
 , Noso.Core.Module
 ;
@@ -30,6 +30,7 @@ type
       const AName:String;
       const AModuleEvent: TModuleEvent
     );
+    { #todo 100 -ogcarreno : Implement addition of messages }
   published
   end;
 
@@ -44,11 +45,16 @@ procedure TDispatcher.RegisterModule(
 var
   module: TModule;
 begin
-  { #todo 90 -ogcarreno : Maybe make sure to not register twice? }
-  module:= TModule.Create;
-  module.Name:= AName;
-  module.OnModuleEvent:= AModuleEvent;
-  FModules.Add(module);
+  FCriticalSection.Enter;
+  try
+    { #todo 90 -ogcarreno : Maybe make sure to not register twice? }
+    module:= TModule.Create;
+    module.Name:= AName;
+    module.OnModuleEvent:= AModuleEvent;
+    FModules.Add(module);
+  finally
+    FCriticalSection.Leave;
+  end;
 end;
 
 constructor TDispatcher.Create;
